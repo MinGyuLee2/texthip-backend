@@ -1,0 +1,22 @@
+name: "🚀 Deploy"
+description: "배포 관련 작업"
+labels: ["deploy"]
+body:
+    - type: textarea
+      attributes:
+          label: 📄 배포 내용
+          description: 어떤 배포 작업인지 작성해 주세요.
+          placeholder: 예) v1.0.2 기능 배포 / hotfix 배포 등
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: ✅ 배포 체크리스트
+          description: 배포 전/후 확인해야 할 항목을 작성해 주세요.
+          placeholder: 1. CI/CD 확인 2. 기능 정상 동작 확인 3. 모니터링 설정 확인
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 🙋🏻 참고 사항
+          description: 배포와 관련해 참고해야 하는 내용이 있으면 작성해 주세요.

@@ -1,0 +1,22 @@
+name: "🛠️ Refactor"
+description: "리팩토링"
+labels: ["refactor"]
+body:
+    - type: textarea
+      attributes:
+          label: 📄 리팩토링 설명
+          description: 어떤 리팩토링을 진행하려는지 작성해 주세요.
+          placeholder: 예) 컴포넌트 구조 개선, 상태 관리 리팩토링 등
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: ✅ 작업할 내용
+          description: 진행할 리팩토링 내용을 체크박스로 작성해 주세요.
+          placeholder: 1. 불필요한 props 제거 2. 상태 로직 분리 3. 테스트 코드 보완
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 🙋🏻 참고 사항
+          description: 참고 자료, 레퍼런스 링크 등이 있다면 작성해 주세요.

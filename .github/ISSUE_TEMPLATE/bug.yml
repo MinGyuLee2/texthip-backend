@@ -1,0 +1,27 @@
+name: "🐞 Bug"
+description: "버그 제보"
+labels: ["bug"]
+body:
+    - type: textarea
+      attributes:
+          label: 📄 버그 설명
+          description: 어떤 문제가 발생했는지 자세히 작성해 주세요.
+          placeholder: 예) 특정 페이지에서 버튼 클릭 시 에러 발생
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: ✅ 재현 방법
+          description: 어떤 상황에서, 어떤 단계로 재현되는지 작성해 주세요.
+          placeholder: 1. 페이지 접속 2. 버튼 클릭 3. 에러 발생
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: 🙋🏻 기대 동작
+          description: 원래 기대했던 동작이 무엇인지 작성해 주세요.
+          placeholder: 예) 버튼 클릭 시 상세 페이지로 이동
+    - type: textarea
+      attributes:
+          label: 📸 스크린샷 및 로그
+          description: 참고할 수 있는 스크린샷, 에러 로그 등이 있다면 첨부해 주세요.
