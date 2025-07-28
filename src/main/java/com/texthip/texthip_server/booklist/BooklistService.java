@@ -59,5 +59,7 @@ public class BooklistService {
                 .build();
         
         booklistItemRepository.save(booklistItem);
+        booklist.getItems().add(booklistItem);
+
     }
 }
