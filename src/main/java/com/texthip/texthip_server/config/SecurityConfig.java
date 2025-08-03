@@ -8,9 +8,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.texthip.texthip_server.user.CustomOAuth2UserService;
+
+import lombok.RequiredArgsConstructor; 
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+     private final CustomOAuth2UserService customOAuth2UserService;
 
     // 이 메소드가 PasswordEncoder를 Bean으로 등록해줍니다.
     @Bean
@@ -30,7 +37,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/signup", "/health").permitAll()
                 // 나머지 모든 요청은 인증 필요 (나중에 API를 추가하면서 수정)
                 .anyRequest().authenticated()
-            );
+            )
+            .oauth2Login(oauth2 -> oauth2
+            .userInfoEndpoint(userInfo -> userInfo
+                .userService(customOAuth2UserService)
+            )
+        );
 
         return http.build();
     }
