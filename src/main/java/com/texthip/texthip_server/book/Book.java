@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -39,7 +39,7 @@ public class Book {
     @Column(length = 255)
     private String coverImageUrl;
 
-    private Date publicationDate;
+    private LocalDate publicationDate;
 
     private Integer pageCount;
 }
