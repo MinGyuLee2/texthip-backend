@@ -1,10 +1,12 @@
 package com.texthip.texthip_server.book;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -20,10 +22,10 @@ public class BookController {
         return ResponseEntity.ok(bookDetails);
     }
 
-    // 도서 검색 API (예: /api/books/search?title=어린왕자)
+    // 도서 검색 API (예: /api/books/search?title=어린왕자&page=0&size=10)
     @GetMapping("/search")
-    public ResponseEntity<List<BookDetailResponseDto>> searchBooks(@RequestParam String title) {
-        List<BookDetailResponseDto> books = bookService.searchBooksByTitle(title);
+    public ResponseEntity<Page<BookDetailResponseDto>> searchBooks(@RequestParam String title, Pageable pageable) {
+        Page<BookDetailResponseDto> books = bookService.searchBooksByTitle(title, pageable);
         return ResponseEntity.ok(books);
     }
 }

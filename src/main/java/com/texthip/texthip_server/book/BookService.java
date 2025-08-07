@@ -1,11 +1,11 @@
 package com.texthip.texthip_server.book;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,11 +23,9 @@ public class BookService {
 
     // 제목으로 도서 검색
     @Transactional(readOnly = true)
-    public List<BookDetailResponseDto> searchBooksByTitle(String title) {
+    public Page<BookDetailResponseDto> searchBooksByTitle(String title, Pageable pageable) {
         // TODO: 향후 외부 도서 API(알라딘 등)와 연동하여 DB에 없는 책도 검색하고 저장하는 로직 추가
-        return bookRepository.findByTitleContainingIgnoreCase(title)
-                .stream()
-                .map(BookDetailResponseDto::new)
-                .collect(Collectors.toList());
+        Page<Book> bookPage = bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+        return bookPage.map(BookDetailResponseDto::new);
     }
 }
