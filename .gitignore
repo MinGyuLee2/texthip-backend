@@ -38,3 +38,4 @@ out/
 
 ### Secret configuration files ###
 application-oauth.yml
+application-local.yml
