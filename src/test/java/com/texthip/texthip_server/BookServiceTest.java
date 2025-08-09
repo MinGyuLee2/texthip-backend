@@ -2,6 +2,7 @@ package com.texthip.texthip_server;
 
 import com.texthip.texthip_server.book.Book;
 import com.texthip.texthip_server.book.BookDetailResponseDto;
+import com.texthip.texthip_server.book.BookNotFoundException;
 import com.texthip.texthip_server.book.BookRepository;
 import com.texthip.texthip_server.book.BookService;
 
@@ -10,12 +11,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -53,7 +55,7 @@ class BookServiceTest {
         BookDetailResponseDto responseDto = bookService.getBookDetails(isbn);
 
         // then (결과 검증)
-        assertNotNull(responseDto);
+        assertEquals(isbn, responseDto.getIsbn());
         assertEquals("어린 왕자", responseDto.getTitle());
     }
 
@@ -64,7 +66,7 @@ class BookServiceTest {
         String nonExistentIsbn = "0000000000000";
 
         // when & then (행동 및 결과 검증)
-        assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(BookNotFoundException.class, () -> {
             bookService.getBookDetails(nonExistentIsbn);
         });
     }
@@ -74,13 +76,13 @@ class BookServiceTest {
     void searchBooksByTitle_success() {
         // given (주어진 상황)
         String query = "왕자";
+        Pageable pageable = PageRequest.of(0, 10);
 
         // when (행동)
-        List<BookDetailResponseDto> results = bookService.searchBooksByTitle(query);
+        Page<BookDetailResponseDto> results = bookService.searchBooksByTitle(query, pageable);
 
         // then (결과 검증)
-        assertFalse(results.isEmpty());
-        assertEquals(1, results.size());
-        assertEquals("어린 왕자", results.get(0).getTitle());
+        assertEquals(1, results.getTotalElements());
+        assertEquals("어린 왕자", results.getContent().get(0).getTitle());
     }
 }

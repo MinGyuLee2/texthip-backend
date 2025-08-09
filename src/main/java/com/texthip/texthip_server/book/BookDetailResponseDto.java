@@ -2,7 +2,7 @@ package com.texthip.texthip_server.book;
 
 import lombok.Getter;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Getter
 public class BookDetailResponseDto {
@@ -12,7 +12,7 @@ public class BookDetailResponseDto {
     private String publisher;
     private String description;
     private String coverImageUrl;
-    private Date publicationDate;
+    private LocalDate publicationDate;
     private Integer pageCount;
 
     public BookDetailResponseDto(Book book) {
