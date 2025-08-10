@@ -38,7 +38,7 @@ public class JwtTokenProvider {
                 .setSubject(userPrincipal.getUsername()) // 여기서 getUsername()은 UserDetails의 email을 반환합니다.
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
     
@@ -50,7 +50,7 @@ public class JwtTokenProvider {
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
