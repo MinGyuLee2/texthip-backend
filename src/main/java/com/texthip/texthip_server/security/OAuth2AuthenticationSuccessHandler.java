@@ -1,6 +1,5 @@
 package com.texthip.texthip_server.security;
 
-import com.texthip.texthip_server.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
