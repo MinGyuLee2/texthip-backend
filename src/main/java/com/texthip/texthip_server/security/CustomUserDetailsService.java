@@ -1,14 +1,16 @@
 package com.texthip.texthip_server.security;
 
+import com.texthip.texthip_server.user.User; // User 임포트 추가
+import com.texthip.texthip_server.user.UserDetailsImpl; // UserDetailsImpl 임포트 추가
 import com.texthip.texthip_server.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service; // 1. import 구문 추가
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service 
+@Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -17,8 +19,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // User 엔티티가 UserDetails를 구현하도록 해야 합니다.
-        return userRepository.findByEmail(email)
+        // 1. 이메일로 User 엔티티를 찾습니다.
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        // 2. 찾은 User 엔티티를 UserDetailsImpl로 감싸서 반환합니다.
+        return new UserDetailsImpl(user);
     }
 }
