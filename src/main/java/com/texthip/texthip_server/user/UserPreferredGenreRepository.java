@@ -1,0 +1,6 @@
+package com.texthip.texthip_server.user;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserPreferredGenreRepository extends JpaRepository<UserPreferredGenre, Long> {
+}

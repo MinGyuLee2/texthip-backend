@@ -21,4 +21,9 @@ public class UserPreferredGenre {
 
     @Column(length = 50, nullable = false)
     private String genreName;
+
+    public UserPreferredGenre(User user, String genreName) {
+        this.user = user;
+        this.genreName = genreName;
+    }
 }

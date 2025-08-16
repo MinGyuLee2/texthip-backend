@@ -41,4 +41,13 @@ public class UserProfile {
     public UserProfile(User user) {
         this.user = user;
     }
+
+    public void updateProfile(String ageRange, String gender, String job, String jobInfo, String readingTime, Integer monthlyReadingGoal) {
+        this.ageRange = ageRange;
+        this.gender = gender;
+        this.job = job;
+        this.jobInfo = jobInfo;
+        this.readingTime = readingTime;
+        this.monthlyReadingGoal = monthlyReadingGoal;
+    }
 }

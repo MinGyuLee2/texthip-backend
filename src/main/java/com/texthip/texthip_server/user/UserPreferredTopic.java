@@ -21,4 +21,9 @@ public class UserPreferredTopic {
 
     @Column(length = 50, nullable = false)
     private String topicName;
+
+    public UserPreferredTopic(User user, String topicName) {
+        this.user = user;
+        this.topicName = topicName;
+    }
 }
