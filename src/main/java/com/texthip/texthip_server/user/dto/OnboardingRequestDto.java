@@ -1,9 +1,11 @@
 package com.texthip.texthip_server.user.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class OnboardingRequestDto {
     // 기본 정보
     private String ageRange;

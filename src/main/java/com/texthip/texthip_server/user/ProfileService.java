@@ -41,12 +41,14 @@ public class ProfileService {
         requestDto.getPreferredGenres().forEach(genreName -> {
             UserPreferredGenre genre = new UserPreferredGenre(user, genreName);
             genreRepository.save(genre);
+            user.getPreferredGenres().add(genre);
         });
 
         // 새로운 관심 주제 저장
         requestDto.getPreferredTopics().forEach(topicName -> {
             UserPreferredTopic topic = new UserPreferredTopic(user, topicName);
             topicRepository.save(topic);
+            user.getPreferredTopics().add(topic);
         });
     }
 }
