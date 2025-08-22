@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // '/api/users/signup', '/api/users/login' 등은 인증 없이 접근 허용
-                        .requestMatchers("/api/users/signup", "/api/users/login", "/health").permitAll()
+                        .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
