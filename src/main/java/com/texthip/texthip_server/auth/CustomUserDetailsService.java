@@ -1,4 +1,4 @@
-package com.texthip.texthip_server.security;
+package com.texthip.texthip_server.auth;
 
 import com.texthip.texthip_server.user.User; // User 임포트 추가
 import com.texthip.texthip_server.user.UserDetailsImpl; // UserDetailsImpl 임포트 추가

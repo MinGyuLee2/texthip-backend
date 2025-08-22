@@ -7,10 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.texthip.texthip_server.auth.AuthService;
+import com.texthip.texthip_server.auth.dto.UserSignupRequestDto;
 import com.texthip.texthip_server.user.User;
 import com.texthip.texthip_server.user.UserRepository;
-import com.texthip.texthip_server.user.UserService;
-import com.texthip.texthip_server.user.dto.UserSignupRequestDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Autowired
-    private UserService userService;
+    private AuthService userService;
 
     @Autowired
     private UserRepository userRepository;

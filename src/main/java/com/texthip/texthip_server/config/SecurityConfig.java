@@ -1,8 +1,9 @@
 package com.texthip.texthip_server.config;
 
-import com.texthip.texthip_server.security.JwtAuthenticationFilter;
-import com.texthip.texthip_server.security.OAuth2AuthenticationSuccessHandler;
-import com.texthip.texthip_server.user.CustomOAuth2UserService;
+import com.texthip.texthip_server.auth.CustomOAuth2UserService;
+import com.texthip.texthip_server.auth.JwtAuthenticationFilter;
+import com.texthip.texthip_server.auth.OAuth2AuthenticationSuccessHandler;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +44,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // '/api/users/signup', '/api/users/login' 등은 인증 없이 접근 허용
-                        .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

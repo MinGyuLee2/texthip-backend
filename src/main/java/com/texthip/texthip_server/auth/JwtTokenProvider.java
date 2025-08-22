@@ -1,4 +1,4 @@
-package com.texthip.texthip_server.security;
+package com.texthip.texthip_server.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

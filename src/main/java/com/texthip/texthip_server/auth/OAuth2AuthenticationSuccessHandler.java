@@ -1,4 +1,4 @@
-package com.texthip.texthip_server.security;
+package com.texthip.texthip_server.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
