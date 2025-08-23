@@ -1,4 +1,4 @@
-package com.texthip.texthip_server.user.dto;
+package com.texthip.texthip_server.auth.dto;
 
 import lombok.Getter;
 

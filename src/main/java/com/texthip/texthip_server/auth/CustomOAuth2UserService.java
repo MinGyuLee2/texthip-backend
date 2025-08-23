@@ -1,4 +1,4 @@
-package com.texthip.texthip_server.user;
+package com.texthip.texthip_server.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -6,6 +6,10 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import com.texthip.texthip_server.user.User;
+import com.texthip.texthip_server.user.UserRepository;
+
 import java.util.Map;
 
 @Service
