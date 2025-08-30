@@ -43,7 +43,6 @@ public class SecurityConfig {
                 // 세션을 사용하지 않으므로 STATELESS로 설정
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // '/api/users/signup', '/api/users/login' 등은 인증 없이 접근 허용
                         .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )

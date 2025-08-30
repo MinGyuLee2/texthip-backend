@@ -1,7 +1,14 @@
 package com.texthip.texthip_server.book;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,20 +31,44 @@ public class BookService {
         return new BookDetailResponseDto(book);
     }
 
-    // 제목으로 도서 검색
-    @Transactional(readOnly = true)
+     // 제목으로 도서 검색 (DB + 알라딘 API 연동 및 저장)
+    @Transactional 
     public Page<BookDetailResponseDto> searchBooksByTitle(String title, Pageable pageable) {
-        // 1. 먼저 우리 DB에서 검색
+        // 1. 우리 DB에서 먼저 검색
         Page<Book> bookPage = bookRepository.findByTitleContainingIgnoreCase(title, pageable);
 
-         // 2. DB 검색 결과가 없으면, 알라딘 API를 통해 외부에서 검색
+        // 2. DB 검색 결과가 없으면, 알라딘 API를 통해 외부에서 검색
         if (bookPage.isEmpty()) {
             AladinSearchResponseDto aladinResponse = aladinApiClient.searchBooksByTitle(title);
+
+            // 3. 알라딘 검색 결과를 우리 Book 엔티티로 변환하고 DB에 저장
+            List<Book> newBooks = aladinResponse.getItem().stream()
+                    .map(aladinBookDto -> {
+                        // 이미 DB에 존재하는 책인지 ISBN으로 확인 (중복 저장 방지)
+                        return bookRepository.findById(aladinBookDto.getIsbn13())
+                                .orElseGet(() -> {
+                                    // DTO를 Book 엔티티로 변환
+                                    Book book = Book.builder()
+                                            .isbn(aladinBookDto.getIsbn13())
+                                            .title(aladinBookDto.getTitle())
+                                            .author(aladinBookDto.getAuthor())
+                                            .publisher(aladinBookDto.getPublisher())
+                                            .description(aladinBookDto.getDescription())
+                                            .coverImageUrl(aladinBookDto.getCover())
+                                            // String을 LocalDate로 변환
+                                            .publicationDate(LocalDate.parse(aladinBookDto.getPubDate(), DateTimeFormatter.ISO_LOCAL_DATE))
+                                            .build();
+                                    return bookRepository.save(book);
+                                });
+                    })
+                    .collect(Collectors.toList());
+
+            // 4. 저장된 엔티티 리스트를 Page<BookDetailResponseDto> 형식으로 변환하여 반환
+            List<BookDetailResponseDto> dtoList = newBooks.stream()
+                    .map(BookDetailResponseDto::new)
+                    .collect(Collectors.toList());
             
-            // TODO: 알라딘 검색 결과를 우리 Book 엔티티로 변환하고,
-            //       필요하다면 우리 DB에 저장하는 로직 추가
-            //       (이후 사용자들이 북리스트에 추가하거나 리뷰를 남기려면 DB에 존재해야 함)
-            //       변환된 결과를 Page<BookDetailResponseDto> 형식으로 맞춰서 반환
+            return new PageImpl<>(dtoList, pageable, dtoList.size());
         }
 
         return bookPage.map(BookDetailResponseDto::new);
