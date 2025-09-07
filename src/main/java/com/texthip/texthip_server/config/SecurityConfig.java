@@ -43,7 +43,7 @@ public class SecurityConfig {
                 // 세션을 사용하지 않으므로 STATELESS로 설정
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/books/bestsellers").permitAll()
+                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/books/bestsellers", "/api/books/search").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
