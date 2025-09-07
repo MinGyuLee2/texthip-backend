@@ -1,21 +1,21 @@
 package com.texthip.texthip_server.book;
 
+import com.texthip.texthip_server.book.dto.AladinSearchResponseDto;
+import com.texthip.texthip_server.book.dto.BookDetailResponseDto;
+import com.texthip.texthip_server.common.CustomPageResponseDto;
+
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.texthip.texthip_server.book.dto.AladinSearchResponseDto;
-import com.texthip.texthip_server.book.dto.AladinSearchResponseDto.AladinBookDto;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,112 +24,103 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AladinApiClient aladinApiClient;
 
-    // ISBN으로 특정 도서 정보 조회 
+    /**
+     * ISBN으로 특정 도서의 상세 정보를 조회합니다.
+     * DB에 없으면 알라딘 API를 호출하여 정보를 가져온 후 DB에 저장(캐싱)합니다.
+     */
     @Transactional
     public BookDetailResponseDto getBookDetails(String isbn) {
-        // 1. DB에서 ISBN으로 책을 찾습니다.
         Book book = bookRepository.findById(isbn)
-                // 2. DB에 책이 없으면 orElseGet 블록을 실행합니다.
                 .orElseGet(() -> {
-                    // 3. 알라딘 API를 호출합니다.
                     AladinSearchResponseDto response = aladinApiClient.lookupBookByIsbn(isbn);
-
-                    // 알라딘에서도 책을 찾지 못하면 예외를 발생시킵니다.
-                    if (response.getItem() == null || response.getItem().isEmpty()) {
+                    if (response == null || response.getItem() == null || response.getItem().isEmpty()) {
                         throw new BookNotFoundException(isbn);
                     }
-                    
-                    AladinBookDto aladinBookDto = response.getItem().get(0);
-
-                    // 4. API 결과를 Book 엔티티로 변환합니다.
-                    Book newBook = Book.builder()
-                            .isbn(aladinBookDto.getIsbn13())
-                            .title(aladinBookDto.getTitle())
-                            .author(aladinBookDto.getAuthor())
-                            .publisher(aladinBookDto.getPublisher())
-                            .description(aladinBookDto.getDescription())
-                            .coverImageUrl(aladinBookDto.getCover())
-                            .publicationDate(LocalDate.parse(aladinBookDto.getPubDate(), DateTimeFormatter.ISO_LOCAL_DATE))
-                            .build();
-                    
-                    // 5. DB에 저장하고, 저장된 엔티티를 반환합니다.
-                    return bookRepository.save(newBook);
+                    return bookRepository.save(convertDtoToBook(response.getItem().get(0)));
                 });
-
         return new BookDetailResponseDto(book);
     }
 
-    // 제목으로 도서 검색 (DB + 알라딘 API 연동 및 저장)
-    @Transactional 
-    public Page<BookDetailResponseDto> searchBooksByTitle(String title, Pageable pageable) {
-        // 1. 우리 DB에서 먼저 검색
-        Page<Book> bookPage = bookRepository.findByTitleContainingIgnoreCase(title, pageable);
 
-        // 2. DB 검색 결과가 없으면, 알라딘 API를 통해 외부에서 검색
-        if (bookPage.isEmpty()) {
-            AladinSearchResponseDto aladinResponse = aladinApiClient.searchBooksByTitle(title);
+    /**
+     * 알라딘 API를 통해 베스트셀러 목록을 조회하고 DB에 업데이트합니다.
+     */
+     @Transactional
+    public List<BookDetailResponseDto> getBestsellerList(int size) {
+        AladinSearchResponseDto aladinResponse = aladinApiClient.getBestsellers(size);
 
-            // 3. 알라딘 검색 결과를 우리 Book 엔티티로 변환하고 DB에 저장
-            List<Book> newBooks = aladinResponse.getItem().stream()
-                    .map(aladinBookDto -> {
-                        // 이미 DB에 존재하는 책인지 ISBN으로 확인 (중복 저장 방지)
-                        return bookRepository.findById(aladinBookDto.getIsbn13())
-                                .orElseGet(() -> {
-                                    // DTO를 Book 엔티티로 변환
-                                    Book book = Book.builder()
-                                            .isbn(aladinBookDto.getIsbn13())
-                                            .title(aladinBookDto.getTitle())
-                                            .author(aladinBookDto.getAuthor())
-                                            .publisher(aladinBookDto.getPublisher())
-                                            .description(aladinBookDto.getDescription())
-                                            .coverImageUrl(aladinBookDto.getCover())
-                                            // String을 LocalDate로 변환
-                                            .publicationDate(LocalDate.parse(aladinBookDto.getPubDate(), DateTimeFormatter.ISO_LOCAL_DATE))
-                                            .build();
-                                    return bookRepository.save(book);
-                                });
-                    })
-                    .collect(Collectors.toList());
-
-            // 4. 저장된 엔티티 리스트를 Page<BookDetailResponseDto> 형식으로 변환하여 반환
-            List<BookDetailResponseDto> dtoList = newBooks.stream()
-                    .map(BookDetailResponseDto::new)
-                    .collect(Collectors.toList());
-            
-            return new PageImpl<>(dtoList, pageable, dtoList.size());
+        if (aladinResponse == null || aladinResponse.getItem() == null) {
+            return Collections.emptyList();
         }
 
-        return bookPage.map(BookDetailResponseDto::new);
-    }
+        upsertBooksFromAladin(aladinResponse.getItem());
 
-    // 베스트셀러 목록 조회 및 DB 저장
-    @Transactional
-    public List<BookDetailResponseDto> getBestsellerList(int count) {
-        // 1. 알라딘 API 호출
-        AladinSearchResponseDto aladinResponse = aladinApiClient.getBestsellers(count);
-
-        // 2. API 결과를 우리 Book 엔티티로 변환하고, 없으면 DB에 저장 (Upsert)
-        List<Book> books = aladinResponse.getItem().stream()
-                .map(aladinBookDto -> 
-                    bookRepository.findById(aladinBookDto.getIsbn13())
-                        .orElseGet(() -> {
-                            Book newBook = Book.builder()
-                                    .isbn(aladinBookDto.getIsbn13())
-                                    .title(aladinBookDto.getTitle())
-                                    .author(aladinBookDto.getAuthor())
-                                    .publisher(aladinBookDto.getPublisher())
-                                    .description(aladinBookDto.getDescription())
-                                    .coverImageUrl(aladinBookDto.getCover())
-                                    .publicationDate(LocalDate.parse(aladinBookDto.getPubDate(), DateTimeFormatter.ISO_LOCAL_DATE))
-                                    .build();
-                            return bookRepository.save(newBook);
-                        })
-                )
+        List<String> isbns = aladinResponse.getItem().stream()
+                .map(AladinSearchResponseDto.AladinBookDto::getIsbn13)
                 .collect(Collectors.toList());
 
-        // 3. 최종 결과를 DTO 리스트로 변환하여 반환
-        return books.stream()
+        return bookRepository.findAllById(isbns).stream()
                 .map(BookDetailResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 알라딘 API 응답 목록을 받아, DB에 존재하지 않는 책만 저장합니다. (성능 최적화)
+     */
+    private void upsertBooksFromAladin(List<AladinSearchResponseDto.AladinBookDto> aladinBooks) {
+        Set<String> isbns = aladinBooks.stream()
+                .map(AladinSearchResponseDto.AladinBookDto::getIsbn13)
+                .collect(Collectors.toSet());
+
+        Set<String> existingIsbns = bookRepository.findExistingIsbns(isbns);
+
+        List<Book> newBooks = aladinBooks.stream()
+                .filter(dto -> !existingIsbns.contains(dto.getIsbn13()))
+                .map(this::convertDtoToBook)
+                .collect(Collectors.toList());
+
+        if (!newBooks.isEmpty()) {
+            bookRepository.saveAll(newBooks);
+        }
+    }
+
+     /**
+     * 키워드로 도서를 검색합니다.
+     * 알라딘 API에서 검색 결과를 가져와 DB를 업데이트하고, 최종적으로 DB에서 페이징된 결과를 반환합니다.
+     */
+    @Transactional
+    public CustomPageResponseDto<BookDetailResponseDto> searchBooksByKeyword(String keyword, Pageable pageable) {
+        // 알라딘 API는 페이지 번호가 1부터 시작하므로 +1
+        AladinSearchResponseDto aladinResponse = aladinApiClient.searchBooksByKeyword(keyword, pageable.getPageNumber() + 1);
+
+        if (aladinResponse == null || aladinResponse.getItem() == null || aladinResponse.getItem().isEmpty()) {
+            // 알라딘 검색 결과가 없으면 DB에서만 검색
+            Page<Book> bookPage = bookRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+            return new CustomPageResponseDto<>(bookPage.map(BookDetailResponseDto::new));
+        }
+
+        // API 결과를 DB에 저장 또는 업데이트 (Upsert)
+        upsertBooksFromAladin(aladinResponse.getItem());
+
+        // DB에서 최종적으로 다시 검색하여 페이징된 결과 반환
+        Page<Book> bookPage = bookRepository.findByTitleContainingIgnoreCase(keyword, pageable);
+        Page<BookDetailResponseDto> bookDtoPage = bookPage.map(BookDetailResponseDto::new);
+
+        return new CustomPageResponseDto<>(bookDtoPage);
+    }
+
+    /**
+     * AladinBookDto를 Book 엔티티로 변환하는 공통 메소드
+     */
+    private Book convertDtoToBook(AladinSearchResponseDto.AladinBookDto dto) {
+        return Book.builder()
+                .isbn(dto.getIsbn13())
+                .title(dto.getTitle())
+                .author(dto.getAuthor())
+                .publisher(dto.getPublisher())
+                .description(dto.getDescription())
+                .coverImageUrl(dto.getCover())
+                .publicationDate(LocalDate.parse(dto.getPubDate(), DateTimeFormatter.ISO_LOCAL_DATE))
+                .build();
     }
 }
