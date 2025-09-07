@@ -1,15 +1,18 @@
 package com.texthip.texthip_server.book;
 
+import com.texthip.texthip_server.book.dto.BookDetailResponseDto;
+import com.texthip.texthip_server.book.dto.SearchRequestDto;
+import com.texthip.texthip_server.common.CustomPageResponseDto;
+import org.springframework.data.domain.Pageable;
+
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,18 +29,23 @@ public class BookController {
     }
 
     // 도서 검색 API (예: /api/books/search?title=어린왕자&page=0&size=10)
-    @GetMapping("/search")
-    public ResponseEntity<Page<BookDetailResponseDto>> searchBooks(@RequestParam String title, Pageable pageable) {
-        Page<BookDetailResponseDto> books = bookService.searchBooksByTitle(title, pageable);
+    @PostMapping("/search")
+    public ResponseEntity<CustomPageResponseDto<BookDetailResponseDto>> searchBooksByKeyword(
+            @RequestBody SearchRequestDto request) {
+
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        CustomPageResponseDto<BookDetailResponseDto> books =
+                bookService.searchBooksByKeyword(request.getQuery(), pageable);
+
         return ResponseEntity.ok(books);
     }
 
     // 베스트셀러 목록 조회 API (예: /api/books/bestsellers?size=5)
     @GetMapping("/bestsellers")
     public ResponseEntity<List<BookDetailResponseDto>> getBestsellers(
-            @RequestParam(defaultValue = "5") int size //클라이언트 요청이 없으면 기본 5개 
+            @RequestParam(defaultValue = "5") int size
     ) {
-        List<BookDetailResponseDto> bestsellerList = bookService.getBestsellerList(size);
-        return ResponseEntity.ok(bestsellerList);
+        List<BookDetailResponseDto> bestsellers = bookService.getBestsellerList(size);
+        return ResponseEntity.ok(bestsellers);
     }
 }
