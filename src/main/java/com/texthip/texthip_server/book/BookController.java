@@ -5,7 +5,6 @@ import com.texthip.texthip_server.book.dto.SearchRequestDto;
 import com.texthip.texthip_server.common.CustomPageResponseDto;
 import org.springframework.data.domain.Pageable;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.PageRequest;
