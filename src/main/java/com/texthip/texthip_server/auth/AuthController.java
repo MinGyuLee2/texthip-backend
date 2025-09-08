@@ -1,11 +1,9 @@
 package com.texthip.texthip_server.auth;
 
-
 import com.texthip.texthip_server.auth.dto.TokenResponseDto;
 import com.texthip.texthip_server.auth.dto.UserLoginRequestDto;
 import com.texthip.texthip_server.auth.dto.UserSignupRequestDto;
-import com.texthip.texthip_server.common.SuccessResponseDto;
-
+import com.texthip.texthip_server.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +20,14 @@ public class AuthController {
     private final AuthService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SuccessResponseDto> signup(@RequestBody UserSignupRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody UserSignupRequestDto requestDto) {
         userService.signup(requestDto);
-        SuccessResponseDto response = new SuccessResponseDto(
-                HttpStatus.OK.value(),
-                "회원가입이 성공적으로 완료되었습니다."
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, "회원가입이 성공적으로 완료되었습니다."));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDto> login(@RequestBody UserLoginRequestDto loginRequest) {
+    public ResponseEntity<ApiResponse<TokenResponseDto>> login(@RequestBody UserLoginRequestDto loginRequest) {
         TokenResponseDto token = userService.login(loginRequest);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, "로그인에 성공했습니다.", token));
     }
 }
