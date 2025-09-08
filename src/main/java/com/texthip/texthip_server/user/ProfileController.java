@@ -1,6 +1,6 @@
 package com.texthip.texthip_server.user;
 
-import com.texthip.texthip_server.common.SuccessResponseDto;
+import com.texthip.texthip_server.common.ApiResponse;
 import com.texthip.texthip_server.user.dto.OnboardingRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,11 +20,11 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @PostMapping("/onboarding")
-    public ResponseEntity<SuccessResponseDto> saveOnboardingInfo(
+    public ResponseEntity<ApiResponse<Void>> saveOnboardingInfo(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody OnboardingRequestDto requestDto) {
-        
+
         profileService.saveOnboardingInfo(userDetails.getUsername(), requestDto);
-        return ResponseEntity.ok(new SuccessResponseDto(HttpStatus.OK.value(), "온보딩 정보가 성공적으로 저장되었습니다."));
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, "온보딩 정보가 성공적으로 저장되었습니다."));
     }
 }
