@@ -5,7 +5,9 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 
-// 도서 상세 페이지에 필요한 모든 정보(ISBN, 제목, 저자, 설명 등)를 담아 클라이언트에게 응답합니다.
+/**
+ * 도서 상세 정보를 클라이언트에게 응답으로 전달하기 위한 DTO 클래스입니다.
+ */
 @Getter
 public class BookDetailResponseDto {
     private String isbn;
@@ -17,7 +19,11 @@ public class BookDetailResponseDto {
     private LocalDate publicationDate;
     private Integer pageCount;
 
-    // Book 엔티티를 DTO로 변환하는 생성자
+    /**
+     * Book 엔티티를 BookDetailResponseDto로 변환하는 생성자입니다.
+     * 엔티티 객체를 직접 노출하지 않고, 필요한 데이터만 가공하여 전달하는 역할을 합니다.
+     * @param book 변환할 Book 엔티티 객체
+     */
     public BookDetailResponseDto(Book book) {
         this.isbn = book.getIsbn();
         this.title = book.getTitle();
