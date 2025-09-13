@@ -164,14 +164,23 @@ public class BookService {
             log.error("날짜 파싱 오류: ISBN={}, PubDate={}", dto.getIsbn13(), dto.getPubDate(), e);
         }
         
-        return Book.builder()
+        Book.BookBuilder bookBuilder = Book.builder()
                 .isbn(dto.getIsbn13())
                 .title(dto.getTitle())
                 .author(dto.getAuthor())
                 .publisher(dto.getPublisher())
                 .description(dto.getDescription())
                 .coverImageUrl(dto.getCover())
-                .publicationDate(publicationDate)
-                .build();
+                .publicationDate(publicationDate);
+
+        if (dto.getSubInfo() != null && dto.getSubInfo().getPacking() != null) {
+            AladinSearchResponseDto.AladinBookDto.PackingInfo packingInfo = dto.getSubInfo().getPacking();
+            bookBuilder.bookWidth(packingInfo.getSizeWidth());
+            bookBuilder.bookHeight(packingInfo.getSizeHeight());
+            bookBuilder.bookDepth(packingInfo.getSizeDepth());
+        }
+        
+        return bookBuilder.build();
     }
 }
+

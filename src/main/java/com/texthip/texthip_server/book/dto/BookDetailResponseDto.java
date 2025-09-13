@@ -18,6 +18,9 @@ public class BookDetailResponseDto {
     private String coverImageUrl;
     private LocalDate publicationDate;
     private Integer pageCount;
+    private Integer bookWidth;
+    private Integer bookHeight;
+    private Integer bookDepth;
 
     /**
      * Book 엔티티를 BookDetailResponseDto로 변환하는 생성자입니다.
@@ -33,5 +36,8 @@ public class BookDetailResponseDto {
         this.coverImageUrl = book.getCoverImageUrl();
         this.publicationDate = book.getPublicationDate();
         this.pageCount = book.getPageCount();
+        this.bookWidth = book.getBookWidth();
+        this.bookHeight = book.getBookHeight();
+        this.bookDepth = book.getBookDepth();
     }
 }
