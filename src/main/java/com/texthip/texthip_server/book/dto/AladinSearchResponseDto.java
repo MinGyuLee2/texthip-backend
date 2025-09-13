@@ -30,5 +30,23 @@ public class AladinSearchResponseDto {
         private String isbn13;
         private String cover;
         private String publisher;
+        private SubInfo subInfo;
+
+        @Getter
+        @NoArgsConstructor
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class SubInfo {
+            private PackingInfo packing;
+        }
+        
+        @Getter
+        @NoArgsConstructor
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class PackingInfo {
+            private int sizeWidth;  // 책 너비(가로)
+            private int sizeHeight; // 책 높이(세로)
+            private int sizeDepth;  // 책 깊이(두께)
+        }
     }
 }
+

@@ -42,7 +42,7 @@ public class AladinApiClient {
                 .queryParam("ItemId", isbn)
                 .queryParam("output", "js") // 응답 형식을 JSON으로 지정
                 .queryParam("Version", "20131101")
-                .queryParam("OptResult", "fulldescription") // 상세 설명까지 모두 포함하도록 요청
+                .queryParam("OptResult", "fulldescription, packing") // 상세 설명까지 모두 포함하도록 요청
                 .encode(StandardCharsets.UTF_8) // 한글 등 파라미터가 깨지지 않도록 UTF-8로 인코딩
                 .build()
                 .toUri();

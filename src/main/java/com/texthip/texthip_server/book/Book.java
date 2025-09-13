@@ -71,4 +71,17 @@ public class Book {
      * 도서의 페이지 수입니다.
      */
     private Integer pageCount;
+
+    /**
+     * 책의 너비 (mm)
+     */
+    private Integer bookWidth;
+    /**
+     * 책의 높이 (mm)
+     */
+    private Integer bookHeight;
+    /**
+     * 책의 깊이/두께 (mm)
+     */
+    private Integer bookDepth;
 }
