@@ -173,7 +173,6 @@ public class BookService {
                 .coverImageUrl(dto.getCover())
                 .publicationDate(publicationDate);
 
-        // --- 책 크기 정보 매핑 로직 수정 ---
         if (dto.getSubInfo() != null && dto.getSubInfo().getPacking() != null) {
             AladinSearchResponseDto.AladinBookDto.PackingInfo packingInfo = dto.getSubInfo().getPacking();
             bookBuilder.bookWidth(packingInfo.getSizeWidth());
