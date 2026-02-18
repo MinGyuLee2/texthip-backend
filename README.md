@@ -25,11 +25,18 @@
 프로젝트는 크게 4개의 핵심 도메인(auth, user, book, booklist)과 3개의 지원 계층(config, common, exception)으로 구성되어 있습니다.
 
 com.texthip.texthip_server
-├── auth          # 🔐 인증/인가 (JWT, OAuth2)
-├── user          # 🧑‍💻 사용자 및 프로필
-├── book          # 📚 도서 정보 (외부 API 연동)
-├── booklist      # 📑 사용자의 도서 목록
-├── config        # ⚙️ 애플리케이션 핵심 설정 (Security, CORS 등)
-├── common        # 📦 공통 응답 DTO 등
-└── exception     # 🛡️ 전역 예외 처리
+
+auth          # 🔐 인증/인가 (JWT, OAuth2)
+
+user          # 🧑‍💻 사용자 및 프로필
+
+book          # 📚 도서 정보 (외부 API 연동)
+
+booklist      # 📑 사용자의 도서 목록
+
+config        # ⚙️ 애플리케이션 핵심 설정 (Security, CORS 등)
+
+common        # 📦 공통 응답 DTO 등
+
+exception     # 🛡️ 전역 예외 처리
 
